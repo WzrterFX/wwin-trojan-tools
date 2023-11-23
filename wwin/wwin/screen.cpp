@@ -138,7 +138,7 @@ namespace Wwin
         }
     }
 
-    void ScreenZoomOut(const int number, const int delay)
+    void ScreenZoom(const int number, const int delay)
     {
         HBITMAP hBitmap;
 

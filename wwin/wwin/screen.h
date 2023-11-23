@@ -12,5 +12,5 @@ namespace Wwin
 
 	void ScreenSlice(int number, int delay);
 
-	void ScreenZoomOut(int number, int delay);
+	void ScreenZoom(int number, int delay);
 }

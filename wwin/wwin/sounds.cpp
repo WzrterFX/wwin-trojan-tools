@@ -4,12 +4,12 @@
 
 namespace Wwin
 {
-    void PlaySoundFromFile(const wchar_t* filePath)
+    void SoundPlayFromFile(const wchar_t* filePath)
     {
         PlaySound(filePath, NULL, SND_FILENAME | SND_ASYNC);
     }
 
-    void PlaySoundFromMemory(const unsigned char* data, size_t dataSize)
+    void SoundPlayFromMemory(const unsigned char* data, size_t dataSize)
     {
         HANDLE hMapping = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, dataSize, NULL);
         LPVOID pMapping = MapViewOfFile(hMapping, FILE_MAP_WRITE, 0, 0, dataSize);
